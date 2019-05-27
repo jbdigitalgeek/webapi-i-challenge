@@ -39,6 +39,27 @@ server.get("/api/users/:id", (req, res) => {
     });
 });
 
+server.delete("/api/users/:id", (req, res) => {
+  const userId = req.params.id;
+  db.remove(userId)
+    .then(user => {
+      if (user) {
+        db.remove(userId).then(removeUser => {
+          res.status(200).json(removeUser);
+        });
+      } else {
+        res
+          .status(404)
+          .json({ message: "The user with the specified ID does not exist." });
+      }
+    })
+    .catch(error => {
+        res
+            .status(500)
+            .json({ error: "The user could not be removed" });
+    });
+});
+
 server.post("/api/users", (req, res) => {
   const { name, bio } = req.body;
   if (!name || !bio) {
